@@ -41,8 +41,7 @@ enemy_width = enemy_size[0] # 캐릭터 가로크기
 enemy_height = enemy_size[1] # 캐릭터 세로크기
 
 #랜덤변수
-rand = random.randrange(0,screen_width-enemy_width)
-enemy_x_pos = rand# 화면 가로의 절반 크기에 해당하는 곳에 위치 (가로 위치)
+enemy_x_pos = random.randrange(0,screen_width-enemy_width)# 화면 가로의 절반 크기에 해당하는 곳에 위치 (가로 위치)
 enemy_y_pos = 0 # 화면 세로 크기 가장 아래에 위치 (세로 위치)
 
 
@@ -116,7 +115,7 @@ while running:
     screen.blit(background, (0,0)) # 맨 왼쪽 위가 (0, 0), 배경그리기
     screen.blit(character, (character_x_pos, character_y_pos))
 
-    screen.blit(enemy,  (enemy_x_pos, enemy_y_pos)) # 적 그리기
+    screen.blit(enemy, (enemy_x_pos, enemy_y_pos)) # 적 그리기
 
     # 타이머 집어 넣기
     # 경과 시간 계산
