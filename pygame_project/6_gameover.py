@@ -1,3 +1,7 @@
+# 1. 모든 공 없애면 게임 종료 (성공)
+# 2. 캐릭터는 공에 닿으면 게임 종료 (실패)
+# 3. 시간 제한 99초 초과 시 게임 종료 (실패)
+
 import os
 import pygame
 
@@ -81,11 +85,19 @@ balls.append({
 weapon_to_remove = -1
 ball_to_remove = -1
 
+# Font 정의
+game_font = pygame.font.Font(None, 40)
+total_time = 100
+start_ticks = pygame.time.get_ticks()#시작 시간 정의
+
+# 게임 종료 메시지 
+# 3가지 /TimeOut, Mission Complete, GameOver
+game_result = "Game Over"
 
 # 이벤트 루프 (무조건)
 running = True # 게임이 진행중인가?
 while running:
-    dt = clock.tick(60) # 게임화면의 초당 프레임 수를 설정
+    dt = clock.tick(30) # 게임화면의 초당 프레임 수를 설정
 
 ### 2. 이벤트 처리 (키보드, 마우스 등)
     for event in pygame.event.get(): # pygame 무조건 필요한 것, 어떤 이벤트가 발생하였는가
@@ -208,7 +220,7 @@ while running:
                     })
                     # 오른쪽으로 튕겨나가는 작은 공
                     balls.append({
-                        "pos_x" : ball_pos_x + (ball_width/2) - (smal l_ball_width/2), # 공 x 좌표
+                        "pos_x" : ball_pos_x + (ball_width/2) - (small_ball_width/2), # 공 x 좌표
                         "pos_y" : ball_pos_y + (ball_height/2) - (small_ball_height/2), # 공 y 좌표
                         "img_idx" : ball_img_idx+1, # 공의 이미지 인덱스
                         "to_x": 3, #공의 x축 이동방향, -3이면 왼쪽으로
@@ -216,7 +228,10 @@ while running:
                         "init_spd_y":ball_speed_y[ball_img_idx+1] # y 최초송독
                     })
                 break
-                 
+        else: # 계속 게임을 진행
+            continue # 안쪽 for 문의 조건이 맞지 않으면 continue
+        break # 안쪽 for 문에서 break를 만나면 여기로 진입가능. 2중 for 문을 한번에 탈출
+
      #충돌된 공 or 무기 없애기
     if ball_to_remove > -1:
          del balls[ball_to_remove]
@@ -226,6 +241,10 @@ while running:
         del weapons[weapon_to_remove]
         weapon_to_remove = -1
 
+    # 모든 공을 없앤 경우 게임 종료(성공)
+    if len(balls) == 0:
+        game_result = "Mission Complete"
+        running = False
 
 
 ### 5. 화면에 그리기
@@ -243,8 +262,27 @@ while running:
     screen.blit(stage, (0, screen_height - stage_height))
     screen.blit(character, (character_x_pos, character_y_pos))
 
+    # 경과 시간 계산
+    elapesd_time = (pygame.time.get_ticks() - start_ticks)/ 1000 # ms-> s
+    timer = game_font.render("Time : {}".format(int(total_time-elapesd_time)), True, (255,255,255))
+    screen.blit(timer, (10,10))
 
+    # 시간 초과 여부
+    if total_time-elapesd_time <=0:
+        game_result = "Time Over"
+        running = False
+    
     pygame.display.update() # 게임화면을 다시 그리기 ! (무조건)
+
+# 게임 오버 메시지
+msg = game_font.render(game_result, True, (255, 255, 0)) # 노란색으로 출력
+msg_rect = msg.get_rect(center=(int(screen_width/2),int(screen_height/2)))
+screen.blit(msg, msg_rect)
+pygame.display.update()
+
+
+# 2초 대기
+pygame.time.delay(2000)
 
 # pygame 종료 (무조건)
 pygame.quit()
